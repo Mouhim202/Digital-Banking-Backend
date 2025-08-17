@@ -19,6 +19,19 @@ public class AccountOperation {
     private OperationType type;
     @ManyToOne
     private BankAccount bankAccount;
+    private String description;
+
+
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+
     public void setType(OperationType type) {
         this.type = type;
     }
