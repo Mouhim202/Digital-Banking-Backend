@@ -1,11 +1,16 @@
 package ma.enset.digitalbankingbackend;
 import lombok.AllArgsConstructor;
+import ma.enset.digitalbankingbackend.dtos.BankAccountDTO;
+import ma.enset.digitalbankingbackend.dtos.CurrentBankAccountDTO;
+import ma.enset.digitalbankingbackend.dtos.CustomerDTO;
+import ma.enset.digitalbankingbackend.dtos.SavingBankAccountDTO;
 import ma.enset.digitalbankingbackend.entities.*;
 import ma.enset.digitalbankingbackend.enums.AccountStatus;
 import ma.enset.digitalbankingbackend.enums.OperationType;
 import ma.enset.digitalbankingbackend.exceptions.BalanceNotSufficientException;
 import ma.enset.digitalbankingbackend.exceptions.BankAccountNotFoundException;
 import ma.enset.digitalbankingbackend.exceptions.CustomerNotFoundExcel;
+import ma.enset.digitalbankingbackend.exceptions.CustomerNotFoundException;
 import ma.enset.digitalbankingbackend.repositories.AccountOperationRepository;
 import ma.enset.digitalbankingbackend.repositories.BankAccountRepository;
 import ma.enset.digitalbankingbackend.repositories.CustomerRepository;
@@ -32,34 +37,40 @@ public class DigitalBankingBackendApplication {
     CommandLineRunner commandLineRunner(BankAccountService bankAccountService) {
         return args -> {
             Stream.of("Hassan", "Imane", "Mohamed").forEach(name -> {
-                Customer customer = new Customer();
+                CustomerDTO customer = new CustomerDTO();
                 customer.setName(name);
                 customer.setEmail(name + "@gmail.com");
 
-                Customer savedCustomer = bankAccountService.saveCustomer(customer);
+                bankAccountService.saveCustomer(customer);
+                CustomerDTO savedCustomer = bankAccountService.saveCustomer(customer);
                 Long customerId = savedCustomer.getId();
 
                 try {
-                    // Créer les comptes pour ce client
+
                     bankAccountService.saveCurrentBankAccount(Math.random() * 90000, 9000, customerId);
                     bankAccountService.saveSavingBankAccount(Math.random() * 120000, 5.5, customerId);
 
-                    // Faire des opérations uniquement sur les comptes de ce client
-                    List<BankAccount> customerAccounts = bankAccountService.bankAccountList()
-                            .stream()
-                            .filter(acc -> acc.getCustomer().getId().equals(customerId))
-                            .toList();
 
-                    for (BankAccount bankAccount : customerAccounts) {
+                    List<BankAccountDTO> customerAccounts = bankAccountService.bankAccountList();
+
+                    for (BankAccountDTO bankAccount : customerAccounts) {
                         for (int i = 0; i < 10; i++) {
-                            bankAccountService.credit(bankAccount.getId(), 10000 + Math.random() * 120000, "Credit");
-                            bankAccountService.debit(bankAccount.getId(), 1000 + Math.random() * 9000, "Debit");
+                            String accountId;
+                            if (bankAccount instanceof SavingBankAccountDTO){
+                                accountId =((SavingBankAccountDTO) bankAccount).getId();
+                            }else {
+                                accountId=((CurrentBankAccountDTO) bankAccount).getId();
+                            }
+                            bankAccountService.credit(accountId, 10000 + Math.random() * 120000, "Credit");
+                            bankAccountService.debit(accountId, 1000 + Math.random() * 9000, "Debit");
                         }
                     }
 
                 } catch (CustomerNotFoundExcel e) {
                     e.printStackTrace();
                 } catch (BankAccountNotFoundException | BalanceNotSufficientException e) {
+                    throw new RuntimeException(e);
+                } catch (CustomerNotFoundException e) {
                     throw new RuntimeException(e);
                 }
             });
