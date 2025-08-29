@@ -51,29 +51,29 @@ public class DigitalBankingBackendApplication {
                     bankAccountService.saveSavingBankAccount(Math.random() * 120000, 5.5, customerId);
 
 
-                    List<BankAccountDTO> customerAccounts = bankAccountService.bankAccountList();
-
-                    for (BankAccountDTO bankAccount : customerAccounts) {
-                        for (int i = 0; i < 10; i++) {
-                            String accountId;
-                            if (bankAccount instanceof SavingBankAccountDTO){
-                                accountId =((SavingBankAccountDTO) bankAccount).getId();
-                            }else {
-                                accountId=((CurrentBankAccountDTO) bankAccount).getId();
-                            }
-                            bankAccountService.credit(accountId, 10000 + Math.random() * 120000, "Credit");
-                            bankAccountService.debit(accountId, 1000 + Math.random() * 9000, "Debit");
-                        }
-                    }
-
                 } catch (CustomerNotFoundExcel e) {
                     e.printStackTrace();
-                } catch (BankAccountNotFoundException | BalanceNotSufficientException e) {
-                    throw new RuntimeException(e);
                 } catch (CustomerNotFoundException e) {
                     throw new RuntimeException(e);
                 }
+
             });
+
+            List<BankAccountDTO> customerAccounts = bankAccountService.bankAccountList();
+
+            for (BankAccountDTO bankAccount : customerAccounts) {
+                for (int i = 0; i < 10; i++) {
+                    String accountId;
+                    if (bankAccount instanceof SavingBankAccountDTO){
+                        accountId =((SavingBankAccountDTO) bankAccount).getId();
+                    }else {
+                        accountId=((CurrentBankAccountDTO) bankAccount).getId();
+                    }
+                    bankAccountService.credit(accountId, 10000 + Math.random() * 120000, "Credit");
+                    bankAccountService.debit(accountId, 1000 + Math.random() * 9000, "Debit");
+                }
+            }
+
         };
     }
     //@Bean

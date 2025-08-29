@@ -1,8 +1,10 @@
 package ma.enset.digitalbankingbackend.mappers;
 
+import ma.enset.digitalbankingbackend.dtos.AccountOperationDTO;
 import ma.enset.digitalbankingbackend.dtos.CurrentBankAccountDTO;
 import ma.enset.digitalbankingbackend.dtos.CustomerDTO;
 import ma.enset.digitalbankingbackend.dtos.SavingBankAccountDTO;
+import ma.enset.digitalbankingbackend.entities.AccountOperation;
 import ma.enset.digitalbankingbackend.entities.CurrentAccount;
 import ma.enset.digitalbankingbackend.entities.Customer;
 import ma.enset.digitalbankingbackend.entities.SavingAccount;
@@ -59,4 +61,13 @@ public class BankAccountMapperImpl {
         return currentAccount;
 
     }
+    public AccountOperationDTO fromAccountOperation(AccountOperation accountOperation){
+        AccountOperationDTO accountOperationDTO=new AccountOperationDTO();
+        BeanUtils.copyProperties(accountOperation,accountOperationDTO);
+        return accountOperationDTO;
+
+
+    }
+
+
 }

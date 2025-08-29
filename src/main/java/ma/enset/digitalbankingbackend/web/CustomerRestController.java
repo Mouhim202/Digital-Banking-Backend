@@ -13,6 +13,7 @@ import java.util.List;
 @RestController
 
 @Slf4j
+@CrossOrigin("*")
 public class CustomerRestController {
 
     private final BankAccountService bankAccountService;
@@ -25,6 +26,12 @@ public class CustomerRestController {
     public List<CustomerDTO> customers() {
         return bankAccountService.listCustomers();
     }
+
+    @GetMapping("/customers/search")
+    public List<CustomerDTO> searchCustomers(@RequestParam(name ="keyword", defaultValue = "") String keyword) {
+        return bankAccountService.searchCustomers(keyword);
+    }
+
     @GetMapping("/customers/{id}")
     public CustomerDTO customer(@PathVariable (name="id")  Long customerId) throws CustomerNotFoundException {
         return bankAccountService.getCustomer(customerId);
@@ -40,9 +47,10 @@ public class CustomerRestController {
         customerDTO.setId(customerId);
         return bankAccountService.updateCustomer(customerDTO);
     }
-    @PostMapping("/customers/{id}")
+    @DeleteMapping("/customers/{id}")
     public void deleteCustomer(@PathVariable Long id) {
         bankAccountService.deleteCustomer(id);
 
     }
+
 }
